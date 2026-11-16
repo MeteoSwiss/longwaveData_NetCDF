@@ -186,12 +186,12 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
             DimVec.(VarNames{i}) = struct('Name', VarNames{i} , 'Length',    { numel(Data) }, 'Unlimited', { false } );
             catVarsVec.(VarNames{i}).Name                  = VarNames{i};
             catVarsVec.(VarNames{i}).Datatype              = 'double';
-            catVarsVec.(VarNames{i}).Attributes            = struct('Name', {'long_name'}, 'Value', { VarNames{i} } );
+            catVarsVec.(VarNames{i}).Attributes            = struct('Name', {'standard_name' 'long_name' 'units' 'description' 'comments'}, 'Value', {' ' VarNames{i} ' ' ' ' ' '} );
             catVarsVec.(VarNames{i}).Dimensions            = VarNames{i};
             catVarsVec.(VarNames{i}).Coordinates           = VarNames{i};
             DimMask.(VarNames{i})                          = [];
             fprintf("WARNING: Variable "+VarNames{i}+" was added to be saved in the NetCDF file with its own dimension, but without specifying Attributes! \n" + ...
-                " -> The precision of the attributes is left to the customer. \n");
+                " -> The precision of the attributes is left to the user. \n");
         end
         VarDims = catVarsVec.(VarNames{i}).Dimensions;
         dimids = DimVec.(VarDims);
