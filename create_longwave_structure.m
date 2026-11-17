@@ -117,13 +117,13 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     % Define the path to the file containing the data values
     %pathToFile = 'LWd_meas_Data.nc';
 
-    DataValuesStruct = (load(DataValues));
-    DataValuesStruct = DataValuesStruct.DataValuesStruct;
+    tmp = (load(DataValues));
+    DataValuesStruct = tmp.DataValuesStruct;
     NameValues = fieldnames(DataValuesStruct);
 
     nValRaw = 0;
     nVal = 0;
-    TimeFiltered = 0.;
+    TimeFiltered = [];
     Cond = 0;
     CondRaw = 0;
     CondRawHalf = 0;
@@ -150,6 +150,8 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
         dtARawHalf.Format = 'dd-MMM-yyyy hh:mm:ss';
         CondRawHalf = dtARawHalf < TimeMax & dtARawHalf > TimeMin;
     end
+
+    assert(~isempty(TimeFiltered), 'No data found within selected time range.');
 
     dt = refDate + days(TimeFiltered);
     dt.Format = 'dd-MMM-yyyy hh:mm:ss';
@@ -179,24 +181,27 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
 
     % Loop over all variables in VarNames to finalise their definition and
     % include them in the NetCDF structure
+    CatNames = fieldnames(catVarsVec);
     for i = 1:numel(VarNames)
-        if ~any(strcmp(fieldnames(catVarsVec), VarNames{i}))
-            disp("Variable "+VarNames{i}+" was not found in catalogue");
+        if ~any(strcmp(CatNames, VarNames{i}))
             Data = DataValuesStruct.(VarNames{i});
             DimVec.(VarNames{i}) = struct('Name', VarNames{i} , 'Length',    { numel(Data) }, 'Unlimited', { false } );
             catVarsVec.(VarNames{i}).Name                  = VarNames{i};
             catVarsVec.(VarNames{i}).Datatype              = 'double';
             catVarsVec.(VarNames{i}).Attributes            = struct('Name', {'standard_name' 'long_name' 'units' 'description' 'comments'}, 'Value', {' ' VarNames{i} ' ' ' ' ' '} );
             catVarsVec.(VarNames{i}).Dimensions            = VarNames{i};
-            catVarsVec.(VarNames{i}).Coordinates           = VarNames{i};
+            catVarsVec.(VarNames{i}).Coordinates           = ' ';
             DimMask.(VarNames{i})                          = [];
-            fprintf("WARNING: Variable "+VarNames{i}+" was added to be saved in the NetCDF file with its own dimension, but without specifying Attributes! \n" + ...
-                " -> The precision of the attributes is left to the user. \n");
+            warning(['Variable "%s" was not found in the catalogue. A minimal metadata definition ' ...
+                'has been created automatically to be saved in the output NetCDF file. The specification ' ...
+                'of the attributes is left to the user.'], VarNames{i});
         end
         VarDims = catVarsVec.(VarNames{i}).Dimensions;
         dimids = DimVec.(VarDims);
         Var = catVarsVec.(VarNames{i});
         Var.Size = dimids.Length;
+
+        assert(isfield(DataValuesStruct,VarNames{i}), 'Field "%s" not found in DataValuesStruct.', VarNames{i});
         temp = DataValuesStruct.(VarNames{i});
 
         % Time-dependent variables are cropped to the selected temporal

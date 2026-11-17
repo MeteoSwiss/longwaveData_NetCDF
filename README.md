@@ -5,6 +5,8 @@ The framework combines:
   - WMO OSCAR-inspired variable descriptions
   - standardized templates for different dataset configurations
   - automatic generation of NetCDF files from MATLAB data structures  
+## Purpose
+This framework generates FAIR, self-describing NetCDF4 datasets for atmospheric downwelling longwave radiation studies using standardized metadata catalogues, dimension definitions and MATLAB data structures.  
 ## FRAMEWORK OVERVIEW
 - `getTemplateCatalogue.m`
   -> selects variable names
@@ -19,8 +21,8 @@ The framework combines:
 - `create_longwave_structure.m`
   -> assembles the dataset by calling all the scripts and associates the data values to each variable before writing the NetCDF file  
 ## INPUT ARGUMENTS FOR create_longwave_structure.m
-  - `fn_netCDF` : must be char with the filename of the netCDF file
-  - `VarNames` : an array of char containing the name of the variables
+  - `fn_netCDF` : path to the output NetCDF file
+  - `VarNames` : list of variable names to include
   - `DataValues` : path to a MAT-file containing a structure named `DataValuesStruct` that contains data values of the mentioned variables in `VarNames`
   - `TimeMin` : Start time in datetime format
   - `TimeMax` : End time in datetime format  
@@ -69,9 +71,10 @@ Variables present in `DataValuesStruct` but not defined in `getVariableCatalogue
 For maximum FAIR compliance, variable metadata, dimensions and descriptions should be fully documented in a second step by the user.  
 For example with: 
 ```matlab
-ncwriteatt('NetCDF_file.nc', 
-	'newVarName', 
-	'description', 
+ncwriteatt( ...
+	'NetCDF_file.nc', ...
+	'newVarName', ...
+	'description', ...
 	'This new variables description')
 ```
 ### Templates
@@ -87,11 +90,11 @@ The following templates of variables can be called, for example
 	- `'inst2noCoef'`  
 ### Metadata standards
 Variable metadata were defined using:
-  - CF Standard Name Table
+  - NetCDF Climate and Forecast (CF) Standard Name Table
   - WMO OSCAR Variables  
 The generated files follow:
   - NetCDF4
-  - CF Conventions  
+  - NetCDF Climate and Forecast (CF) Metadata Conventions  
 ### Input data structure
 The MAT-file provided through DataValues must contain a structure named `DataValuesStruct`, where the fieldnames must correspond to the Name entries defined in `getVariableCatalogue.m`.  
 Example:
@@ -103,7 +106,8 @@ DataValuesStruct.LwdInst1
 DataValuesStruct.LwdInst2
 ```
 ### Assumptions
-  1) Variables using dimension "Time" are stored in the source dataset with the same temporal sampling as the time vector.  
+  1) Variables using dimension "Time" are stored in the source dataset with the same temporal sampling as the `Time` vector.  
+  2) Variables using dimension "TimeRaw" are stored in the source dataset with the same temporal sampling as the `TimeRaw` vector.  
   2) Variables on dimension "Coef" are static regression coefficients and must not be temporally subsetted.
 ## Example
 ```matlab
@@ -112,14 +116,14 @@ create_longwave_structure(...
 	 {'Time' 'Temperature'}, ...
 	'longwaveDataStruct.mat')
 ```
-will create a netcdf file containing those 2 variables, including their attributes and the global general metadata for the entire available time period  
+will create a NetCDF file containing those 2 variables (`Time` and `Temperature`), including their attributes and the global general metadata for the entire available time period.  
 ```matlab
 create_longwave_structure(...
 	'nameFile.nc', ...
 	{'all'}, ...
 	'longwaveDataStruct.mat')
 ```
-will create a netcdf file containing all the variables defined in the variable catalogue with their associated attributes and general global metadata for the entire available time period
+will create a NetCDF file containing all the variables defined in the variable catalogue with their associated attributes and general global metadata for the entire available time period.
 ### Example output
 The generated NetCDF file can be inspected using:
 ```matlab
