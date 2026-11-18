@@ -37,10 +37,10 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     %
     %
     % Possibilities for VarNames are:
-    % TimeRaw, LwdInst1Raw, LwdInst2Raw, SwDiffuseRaw, SwDirectRaw, SwGlobalRaw, 
+    % TimeAllRS, LwdInst1AllRS, LwdInst2AllRS, SwDiffuseAllRS, SwDirectAllRS, SwGlobalAllRS, 
     % ClearSkyFlag, Time, Temperature, ProfileSurfaceTemp, TemperatureGradient, 
     % ProfileSurfacePres, LwdInst1, LwdInst2, water_vapor, SwDiffuse, SwDirect, 
-    % SwGlobal, LibRadtranDLR, ParameterizedDLR, LwdInst1CorrectedIWV, 
+    % SwGlobal, LibRadtranDLR, FitParameterizedDLR, NNParameterizedDLR, LwdInst1CorrectedIWV, 
     % LwdInst2CorrectedIWV, LwdInst1CorrectedSWDif, LwdInst2CorrectedSWDif, 
     % LwdInst1CorrectedIWVSWDif, LwdInst2CorrectedIWVSWDif, SWDifCorrectionCoefDay, 
     % SWDifCorrectionCoefDaySE, SWDifCorrectionCoefAll, SWDifCorrectionCoefAllSE, 
@@ -80,8 +80,8 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
         fn_netCDF {mustBeTextScalar}
         VarNames cell {mustBeNonzeroLengthText, mustBeText}
         DataValues {mustBeTextScalar}
-        TimeMin datetime  = '05-OCT-2011 00:00'
-        TimeMax datetime  = '27-FEB-2026 12:00'
+        TimeMin datetime  = '01-OCT-2011 12:00'
+        TimeMax datetime  = '01-MAR-2026 12:00'
     end
 
 
@@ -121,12 +121,11 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     DataValuesStruct = tmp.DataValuesStruct;
     NameValues = fieldnames(DataValuesStruct);
 
-    nValRaw = 0;
+    nValAllRS = 0;
     nVal = 0;
     TimeFiltered = [];
     Cond = 0;
-    CondRaw = 0;
-    CondRawHalf = 0;
+    CondAllRS = 0;
     refDate = datetime(2000, 1, 1);
     if any(strcmp(NameValues, 'Time'))
         TimeA = DataValuesStruct.Time;
@@ -136,19 +135,13 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
         nVal = numel(TimeA(Cond));
         TimeFiltered = TimeA(Cond);
     end
-    if any(strcmp(NameValues, 'TimeRaw'))
-        TimeARaw = DataValuesStruct.TimeRaw;
-        dtARaw = refDate + days(TimeARaw);
-        dtARaw.Format = 'dd-MMM-yyyy hh:mm:ss';
-        CondRaw = dtARaw < TimeMax & dtARaw > TimeMin;
-        nValRaw = numel(TimeARaw(CondRaw));
-        TimeFiltered = TimeARaw(CondRaw);
-        integerMask = mod(TimeARaw, 1) == 0;
-        temp = DataValuesStruct.TimeRaw;
-        TimeARawHalf = temp(integerMask);
-        dtARawHalf = refDate + days(TimeARawHalf);
-        dtARawHalf.Format = 'dd-MMM-yyyy hh:mm:ss';
-        CondRawHalf = dtARawHalf < TimeMax & dtARawHalf > TimeMin;
+    if any(strcmp(NameValues, 'TimeAllRS'))
+        TimeAAllRS = DataValuesStruct.TimeAllRS;
+        dtAAllRS = refDate + days(TimeAAllRS);
+        dtAAllRS.Format = 'dd-MMM-yyyy hh:mm:ss';
+        CondAllRS = dtAAllRS < TimeMax & dtAAllRS > TimeMin;
+        nValAllRS = numel(TimeAAllRS(CondAllRS));
+        TimeFiltered = TimeAAllRS(CondAllRS);
     end
 
     assert(~isempty(TimeFiltered), 'No data found within selected time range.');
@@ -166,10 +159,9 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
 
 
     %% Load the dimension catalogue
-    DimVec = getDimensionCatalogue(nVal, nValRaw);
+    DimVec = getDimensionCatalogue(nVal, nValAllRS);
     DimMask.Time        = Cond;
-    DimMask.TimeRaw     = CondRaw;
-    DimMask.TimeRawHalf = CondRawHalf;
+    DimMask.TimeAllRS     = CondAllRS;
     DimMask.Coef        = [];
 
     %% Load the common variable catalogue for longwave analysis
