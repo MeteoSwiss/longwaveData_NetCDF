@@ -18,7 +18,7 @@ function TemplateCatalogue = getTemplateCatalogue()
 
     %% Template to chose ALL the RAW data variables in the catalogue
     TemplateCatalogue.allRAW = {'TimeRaw' 'LwdInst1Raw' 'LwdInst2Raw' 'SwDiffuseRaw' 'SwDirectRaw' ...
-        'SwGlobalRaw' 'ClearSkyFlag'};
+        'SwGlobalRaw'};
 
     %% Template to chose only variables related to instument 1 (including coefficients)
     TemplateCatalogue.inst1wCoef = {'Time' 'Temperature' 'ProfileSurfaceTemp' 'TemperatureGradient' 'ProfileSurfacePres' ...

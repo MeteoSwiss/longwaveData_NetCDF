@@ -76,7 +76,7 @@ VarCatalogue.SwGlobalRaw.Attributes       = struct('Name', {'standard_name' 'lon
 VarCatalogue.SwGlobalRaw.Dimensions       = 'TimeRaw';
 VarCatalogue.SwGlobalRaw.Coordinates      = 'TimeRaw';
 
-% %     %% Variable ClearSkyFlag
+    %% Variable ClearSkyFlag
 % %     VarCatalogue.ClearSkyFlag.Name             = 'ClearSkyFlag';
 % %     VarCatalogue.ClearSkyFlag.Datatype         = 'double';
 % %     VarCatalogue.ClearSkyFlag.Attributes       = struct('Name', {'long_name' 'units' 'description' 'comment'}, ...
