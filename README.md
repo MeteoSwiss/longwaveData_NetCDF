@@ -1,5 +1,6 @@
 # longwaveData_NetCDF
 MATLAB framework for creating FAIR and self-describing NetCDF datasets for atmospheric downward longwave radiation studies.  
+
 The framework combines:
   - NetCDF Climate and Forecast (CF)-compliant variable metadata
   - World Meteorological Organization (WMO) Observing Systems Capability Analysis and Review tool (OSCAR)-inspired variable descriptions
@@ -20,13 +21,13 @@ This framework generates FAIR, self-describing NetCDF4 datasets for atmospheric 
   -> writes the NetCDF file
 - `create_longwave_structure.m`
   -> assembles the dataset by calling all the scripts and associates the data values to each variable before writing the NetCDF file  
-## INPUT ARGUMENTS FOR create_longwave_structure.m
+## INPUT ARGUMENTS FOR `create_longwave_structure.m`
   - `fn_netCDF` : path to the output NetCDF file
   - `VarNames` : list of variable names to include
   - `DataValues` : path to a MAT-file containing a structure named `DataValuesStruct` that contains data values of the mentioned variables in `VarNames`
   - `TimeMin` : Start time in datetime format
   - `TimeMax` : End time in datetime format  
-### Possibilities for VarNames are
+### Possibilities for `VarNames` are
 #### AllRS observations
   - `TimeAllRS`
   - `LwdInst1AllRS`
@@ -83,28 +84,8 @@ ncwriteatt( ...
 	'description', ...
 	'This new variables description')
 ```
-### Templates
-The following templates of variables can be called, for example  
-  `VarNames = {'all'}` will load the template vector  
-  Possibilities are:  
-	- `'all'`
-	- `'allCS'`
-	- `'allAllRS'`
-	- `'inst1wCoef'`
-	- `'inst1noCoef'`
-	- `'inst2wCoef'`
-	- `'inst2noCoef'`  
-### Metadata standards
-Variable metadata were defined using:
-  - NetCDF Climate and Forecast (CF) Standard Name Table
-  - World Meteorological Organization (WMO) Observing Systems Capability Analysis and Review tool (OSCAR) variable description  
-
-The generated files follow:
-  - NetCDF4
-  - NetCDF Climate and Forecast (CF) Metadata Conventions
-  - Findable, Accessible, Interoperable, and Reusable (FAIR) data principles  
 ### Input data structure
-The MAT-file provided through DataValues must contain a structure named `DataValuesStruct`, where the fieldnames must correspond to the Name entries defined in `getVariableCatalogue.m`.  
+The MAT-file provided through DataValues must contain a structure named `DataValuesStruct`, where the fieldnames must correspond to the Name entries d>
 Example:
 ```matlab
 DataValuesStruct.TimeAllRS
@@ -119,6 +100,26 @@ DataValuesStruct.LwdInst2
   1) Variables using dimension "Time" are stored in the source dataset with the same temporal sampling as the `Time` vector.  
   2) Variables using dimension "TimeAllRS" are stored in the source dataset with the same temporal sampling as the `TimeAllRS` vector.  
   3) Variables on dimension "Coef" are static regression coefficients and must not be temporally subsetted.
+## Templates
+The following templates of variables can be called, for example  
+  `VarNames = {'all'}` will load the template vector  
+  Possibilities are:  
+	- `'all'`
+	- `'allCS'`
+	- `'allAllRS'`
+	- `'inst1wCoef'`
+	- `'inst1noCoef'`
+	- `'inst2wCoef'`
+	- `'inst2noCoef'`  
+## Metadata standards
+Variable metadata were defined using:
+  - NetCDF Climate and Forecast (CF) Standard Name Table
+  - World Meteorological Organization (WMO) Observing Systems Capability Analysis and Review tool (OSCAR) variable description  
+
+The generated files follow:
+  - NetCDF4
+  - NetCDF Climate and Forecast (CF) Metadata Conventions
+  - Findable, Accessible, Interoperable, and Reusable (FAIR) data principles  
 ## Example
 ```matlab
 create_longwave_structure(...
@@ -134,10 +135,10 @@ create_longwave_structure(...
 	'LongwaveDataStruct.mat')
 ```
 will create a NetCDF file containing all the variables defined in the variable catalogue with their associated attributes and general global metadata for the entire available time period.
-### Example output
+## Example output
 The generated NetCDF file can be inspected using:
 ```shell
 ncdump -h test.nc
 ```
-### License
+## License
 Dataset metadata and generated files are intended to be distributed under CC-BY-4.0 unless specified otherwise.  

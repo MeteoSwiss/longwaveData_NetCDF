@@ -35,11 +35,22 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     %   - TimeMin   : Start time in datetime format (1st available 05-OCT-2011 00:00)
     %   - TimeMax   : End time in datetime format (Last available 27-FEB-2026 12:00)
     %
+    % Example for DataValuesStruct contained in DataValues file:
+    % DataValuesStruct.TimeAllRS
+    % DataValuesStruct.LwdInst1AllRS
+    % DataValuesStruct.Time
+    % DataValuesStruct.Temperature
+    % DataValuesStruct.water_vapor
+    % DataValuesStruct.LwdInst1
+    % DataValuesStruct.LwdInst2
+    %
+    %
     %
     % Possibilities for VarNames are:
-    % TimeAllRS, LwdInst1AllRS, LwdInst2AllRS, SwDiffuseAllRS, SwDirectAllRS, SwGlobalAllRS, 
-    % ClearSkyFlag, Time, Temperature, ProfileSurfaceTemp, TemperatureGradient, 
-    % ProfileSurfacePres, LwdInst1, LwdInst2, water_vapor, SwDiffuse, SwDirect, 
+    % TimeAllRS, LwdInst1AllRS, LwdInst1StdAllRS, LwdInst2AllRS, LwdInst2StdAllRS,
+    % SwDiffuseAllRS, SwDirectAllRS, SwGlobalAllRS, Time, Temperature, 
+    % ProfileSurfaceTemp, TemperatureGradient, ProfileSurfacePres, LwdInst1, 
+    % LwdInst1Std, LwdInst2, LwdInst2Std, water_vapor, SwDiffuse, SwDirect, 
     % SwGlobal, LibRadtranDLR, FitParameterizedDLR, NNParameterizedDLR, LwdInst1CorrectedIWV, 
     % LwdInst2CorrectedIWV, LwdInst1CorrectedSWDif, LwdInst2CorrectedSWDif, 
     % LwdInst1CorrectedIWVSWDif, LwdInst2CorrectedIWVSWDif, SWDifCorrectionCoefDay, 
@@ -50,29 +61,29 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     % VarNames = {'all'} will load the template vector
     %
     % Possibilities are: 
-    % 'all', 'allCS', 'allRAW' 'inst1wCoef', 'inst1noCoef', 'inst2wCoef', 'inst2noCoef'
+    % 'all', 'allCS', 'allAllRS' 'inst1wCoef', 'inst1noCoef', 'inst2wCoef', 'inst2noCoef'
     %
     %
     % Assumption:
-    % Variables using dimension "Time" are stored in the source
-    % dataset with the same temporal sampling as the time vector.
-    %
-    % Assumption:
-    % Variables on dimension "Coef" are static regression
-    % coefficients and must not be temporally subsetted.
+    % 1) Variables using dimension "Time" are stored in the source
+    %   dataset with the same temporal sampling as the time vector.
+    % 2) Variables using dimension "TimeAllRS" are stored in the source
+    %   dataset with the same temporal sampling as the time vector.
+    % 3) Variables on dimension "Coef" are static regression
+    %   coefficients and must not be temporally subsetted.
     %
     %
     % For example: 
     % create_longwave_structure('nameFile.nc', {'Time' 'Temperature'}, 'longwaveDataStruct.mat')
     %
-    % will create a netcdf file containing those 2 variables, including
+    % will create a NetCDF file containing those 2 variables, including
     % their attributes and the global general metadata for the entire
     % available time period
     %
     %
     % create_longwave_structure('nameFile.nc', {'all'}, 'longwaveDataStruct.mat')
     %
-    % will create a netcdf file containing all the variables defined in the
+    % will create a NetCDF file containing all the variables defined in the
     % variable catalogue with their associated attributes and general global
     % metadata for the entire available time period
     %
@@ -85,7 +96,7 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     end
 
 
-    %% General global attributes for PAY can easily be loaded with the following function
+    %% Load global metadata
     nc_gen_Attributes = getGlobalMetadata();
 
     switch VarNames{1}
@@ -114,10 +125,8 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
 
 
     %% Set the time information in global attributes
-    % Define the path to the file containing the data values
-    %pathToFile = 'LWd_meas_Data.nc';
-
     tmp = (load(DataValues));
+    assert(isfield(tmp,'DataValuesStruct'), 'MAT-file does not contain DataValuesStruct.');
     DataValuesStruct = tmp.DataValuesStruct;
     NameValues = fieldnames(DataValuesStruct);
 
@@ -127,7 +136,7 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     Cond = 0;
     CondAllRS = 0;
     refDate = datetime(2000, 1, 1);
-    if any(strcmp(NameValues, 'Time'))
+    if ismember('Time', NameValues)
         TimeA = DataValuesStruct.Time;
         dtA = refDate + days(TimeA);
         dtA.Format = 'dd-MMM-yyyy hh:mm:ss';
@@ -135,7 +144,7 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
         nVal = numel(TimeA(Cond));
         TimeFiltered = TimeA(Cond);
     end
-    if any(strcmp(NameValues, 'TimeAllRS'))
+    if ismember('TimeAllRS', NameValues)
         TimeAAllRS = DataValuesStruct.TimeAllRS;
         dtAAllRS = refDate + days(TimeAAllRS);
         dtAAllRS.Format = 'dd-MMM-yyyy hh:mm:ss';
@@ -145,6 +154,7 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     end
 
     assert(~isempty(TimeFiltered), 'No data found within selected time range.');
+    assert(TimeMax > TimeMin, 'TimeMax must be larger than TimeMin.');
 
     dt = refDate + days(TimeFiltered);
     dt.Format = 'dd-MMM-yyyy hh:mm:ss';
@@ -175,12 +185,12 @@ function create_longwave_structure(fn_netCDF, VarNames, DataValues, TimeMin, Tim
     % include them in the NetCDF structure
     CatNames = fieldnames(catVarsVec);
     for i = 1:numel(VarNames)
-        if ~any(strcmp(CatNames, VarNames{i}))
+        if ~ismember(VarNames{i}, CatNames)
             Data = DataValuesStruct.(VarNames{i});
             DimVec.(VarNames{i}) = struct('Name', VarNames{i} , 'Length',    { numel(Data) }, 'Unlimited', { false } );
             catVarsVec.(VarNames{i}).Name                  = VarNames{i};
             catVarsVec.(VarNames{i}).Datatype              = 'double';
-            catVarsVec.(VarNames{i}).Attributes            = struct('Name', {'standard_name' 'long_name' 'units' 'description' 'comments'}, 'Value', {' ' VarNames{i} ' ' ' ' ' '} );
+            catVarsVec.(VarNames{i}).Attributes            = struct('Name', {'standard_name' 'long_name' 'units' 'description' 'comment'}, 'Value', {' ' VarNames{i} ' ' ' ' ' '} );
             catVarsVec.(VarNames{i}).Dimensions            = VarNames{i};
             catVarsVec.(VarNames{i}).Coordinates           = ' ';
             DimMask.(VarNames{i})                          = [];
