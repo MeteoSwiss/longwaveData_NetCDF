@@ -31,28 +31,30 @@ function GlobalStruct = getGlobalMetadata()
 
     GlobalStruct(12).Name       = 'Conventions';
     GlobalStruct(12).Value      = 'CF-1.11';
-    GlobalStruct(13).Name       = 'standard_name_vocabulary';
-    GlobalStruct(13).Value      = 'CF Standard Name Table';
-    GlobalStruct(14).Name       = 'variable_definition_vocabulary';
-    GlobalStruct(14).Value      = 'WMO OSCAR (Observing Systems Capability Analysis and Review tool)';
-    GlobalStruct(15).Name       = 'Instruments';
-    GlobalStruct(15).Value      = 'Instrument 1: Pyrgeometer Eppley PIR / Instrument 2: Pyrgeometer Kipp & Zonen CG4';
-    GlobalStruct(16).Name       = 'License';
-    GlobalStruct(16).Value      = 'Creative Commons Attribution 4.0 International (CC BY 4.0)';
-    GlobalStruct(17).Name       = 'License_url';
-    GlobalStruct(17).Value      = 'https://creativecommons.org/licenses/by/4.0/';
+    GlobalStruct(13).Name       = 'conventions_url';
+    GlobalStruct(13).Value      = 'https://cfconventions.org/Data/cf-standard-names/current/build/cf-standard-name-table.html';
+    GlobalStruct(14).Name       = 'standard_name_vocabulary';
+    GlobalStruct(14).Value      = 'NetCDF Climate and Forecast (CF) Standard Name Table';
+    GlobalStruct(15).Name       = 'variable_definition_vocabulary';
+    GlobalStruct(15).Value      = 'World Meteorological Organization (WMO) Observing Systems Capability Analysis and Review tool (OSCAR)';
+    GlobalStruct(16).Name       = 'variable_definition_vocabulary_url';
+    GlobalStruct(16).Value      = 'https://space.oscar.wmo.int/variables';
+    GlobalStruct(17).Name       = 'Instruments';
+    GlobalStruct(17).Value      = 'Instrument 1: Pyrgeometer Eppley PIR / Instrument 2: Pyrgeometer Kipp & Zonen CG4';
+    GlobalStruct(18).Name       = 'License';
+    GlobalStruct(18).Value      = 'Creative Commons Attribution 4.0 International (CC BY 4.0)';
+    GlobalStruct(19).Name       = 'License_url';
+    GlobalStruct(19).Value      = 'https://creativecommons.org/licenses/by/4.0/';
 
-    GlobalStruct(18).Name       = 'History';
-    GlobalStruct(18).Value      = 'Created from 1-minute averaged measurements and themselves averages on 30 minutes. Only clear-sky is present in this documentation.';
+    GlobalStruct(20).Name       = 'History';
+    GlobalStruct(20).Value      = 'Created from 1-minute averaged measurements and themselves averages on 30 minutes. Only clear-sky is present in this documentation.';
     
-    GlobalStruct(19).Name       = 'Time coverage start';
-    GlobalStruct(19).Value      = '01-01-2011 00:00:00';
-    GlobalStruct(20).Name       = 'Time coverage end';
-    GlobalStruct(20).Value      = '01-01-2026 00:00:00';
-    GlobalStruct(21).Name       = 'Creation date';
-    GlobalStruct(21).Value      = '01-01-2026 00:00:00';
-
-
+    GlobalStruct(21).Name       = 'Time coverage start';
+    GlobalStruct(21).Value      = '01-01-2011 00:00:00';
+    GlobalStruct(22).Name       = 'Time coverage end';
+    GlobalStruct(22).Value      = '01-01-2026 00:00:00';
+    GlobalStruct(23).Name       = 'Creation date';
+    GlobalStruct(23).Value      = '01-01-2026 00:00:00';
     
 
 end
